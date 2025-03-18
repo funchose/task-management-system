@@ -4,44 +4,69 @@ import com.effectivemobile.taskmanagement.utils.Status;
 import com.effectivemobile.taskmanagement.utils.TaskPriority;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import java.util.ArrayList;
+import java.util.List;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
-@Table(name = "tasks")
+@Table(name = "task")
+@SQLRestriction("is_active <> 'false'")
 public class Task {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")
   private Long id;
-  @Column(name = "author_id")
-  private Long authorId;
-  @Column(name = "performer_id")
-  private Long performerId;
+  @JoinColumn(name = "author_id", referencedColumnName = "id",
+      foreignKey = @ForeignKey(name = "Fk_task_author"))
+  @ManyToOne(fetch = FetchType.LAZY)
+  private Account authorAccount;
+  @JoinColumn(name = "performer_id", referencedColumnName = "id",
+      foreignKey = @ForeignKey(name = "Fk_task_performer"))
+  @ManyToOne(fetch = FetchType.LAZY)
+  private Account performerAccount;
   @NotBlank(message = "Task name is required")
   @Column
   private String name;
   @NotBlank(message = "Task description is required")
   @Column
   private String description;
-  @NotBlank(message = "Task description is required")
+  @OneToMany(
+      mappedBy = "taskId",
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      orphanRemoval = true
+  )
   @Column
-  private String comments;
+  private List<Comment> comments = new ArrayList<>();
   @Enumerated(EnumType.STRING)
   @Column(length = 10)
   private TaskPriority priority;
   @Enumerated(EnumType.STRING)
   @Column(length = 15)
   private Status status;
+  @Column(name = "is_active")
+  private boolean isActive;
 
-  public Task(Long id, Long authorId, Long performerId, String name,
-              String description, String comments, TaskPriority priority, Status status) {
-    this.id = id;
-    this.authorId = authorId;
-    this.performerId = performerId;
+  public boolean isActive() {
+    return isActive;
+  }
+
+  public Task setActive(boolean active) {
+    isActive = active;
+    return this;
+  }
+
+  public Task(Account authorAccount, Account performerAccount,
+              String name, String description, List<Comment> comments,
+              TaskPriority priority, Status status) {
+    this.authorAccount = authorAccount;
+    this.performerAccount = performerAccount;
     this.name = name;
     this.description = description;
-    this.comments = comments;
+    this.comments.addAll(comments);
     this.priority = priority;
     this.status = status;
+    this.isActive = true;
   }
 
   public Task() {
@@ -52,13 +77,13 @@ public class Task {
     return this;
   }
 
-  public Task setAuthorId(Long authorId) {
-    this.authorId = authorId;
+  public Task setAuthorAccount(Account authorAccount) {
+    this.authorAccount = authorAccount;
     return this;
   }
 
-  public Task setPerformerId(Long performerId) {
-    this.performerId = performerId;
+  public Task setPerformerAccount(Account performerAccount) {
+    this.performerAccount = performerAccount;
     return this;
   }
 
@@ -72,7 +97,7 @@ public class Task {
     return this;
   }
 
-  public Task setComments(String comments) {
+  public Task setComments(List<Comment> comments) {
     this.comments = comments;
     return this;
   }
@@ -91,12 +116,12 @@ public class Task {
     return id;
   }
 
-  public Long getAuthorId() {
-    return authorId;
+  public Account getAuthorAccount() {
+    return authorAccount;
   }
 
-  public Long getPerformerId() {
-    return performerId;
+  public Account getPerformerAccount() {
+    return performerAccount;
   }
 
   public String getName() {
@@ -107,7 +132,7 @@ public class Task {
     return description;
   }
 
-  public String getComments() {
+  public List<Comment> getComments() {
     return comments;
   }
 
