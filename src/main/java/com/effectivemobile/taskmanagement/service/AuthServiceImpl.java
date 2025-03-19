@@ -39,10 +39,8 @@ public class AuthServiceImpl implements AuthService {
   @Override
   public SignInResponse signIn(SignInRequest request) {
     authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-        request.getUsername(),
-        request.getPassword()
-    ));
-    var account = accountService.loadUserByUsername(request.getUsername());
+        request.getEmail(), request.getPassword()));
+    var account = accountService.loadUserByEmail(request.getEmail());
     return new SignInResponse(jwtService.generateToken(account));
   }
 
@@ -53,6 +51,7 @@ public class AuthServiceImpl implements AuthService {
       throw new AccountAlreadyExistsException(request.getUsername());
     }
     var account = new Account();
+    account.setEmail(request.getEmail());
     account.setUsername(request.getUsername());
     account.setPassword(passwordEncoder.encode(request.getPassword()));
     account.setRole(Role.ROLE_USER);
@@ -62,8 +61,8 @@ public class AuthServiceImpl implements AuthService {
   @Transactional
   @Override
   public RefreshTokenResponse refreshToken(RefreshTokenRequest request) {
-    var username = jwtService.extractUserName(request.getToken());
-    var account = accountService.loadUserByUsername(username);
+    var username = jwtService.extractEmail(request.getToken());
+    var account = accountService.loadUserByEmail(username);
     return new RefreshTokenResponse(jwtService.generateToken(account));
   }
 }

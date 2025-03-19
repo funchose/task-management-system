@@ -3,21 +3,21 @@ package com.effectivemobile.taskmanagement.DTO.request;
 import jakarta.validation.constraints.NotBlank;
 
 public class SignInRequest {
-  @NotBlank(message = "Username cannot be blank")
-  private String username;
+  @NotBlank(message = "Email cannot be blank")
+  private String email;
   @NotBlank(message = "Password cannot be blank")
   private String password;
 
-  public String getUsername() {
-    return username;
+  public String getEmail() {
+    return email;
   }
 
   public String getPassword() {
     return password;
   }
 
-  public SignInRequest setUsername(String username) {
-    this.username = username;
+  public SignInRequest setEmail(String email) {
+    this.email = email;
     return this;
   }
 

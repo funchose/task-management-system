@@ -1,5 +1,6 @@
 package com.effectivemobile.taskmanagement.security;
 
+import com.effectivemobile.taskmanagement.model.Account;
 import com.effectivemobile.taskmanagement.service.AccountServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -10,7 +11,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -41,16 +41,16 @@ public class AuthTokenFilter extends OncePerRequestFilter {
       return;
     }
     var jwt = authHeader.substring(BEARER_PREFIX.length());
-    var username = jwtService.extractUserName(jwt);
-    if (!username.isEmpty() && SecurityContextHolder.getContext()
+    var email = jwtService.extractEmail(jwt);
+    if (!email.isEmpty() && SecurityContextHolder.getContext()
         .getAuthentication() == null) {
-      UserDetails userDetails = accountService.loadUserByUsername(username);
-      if (jwtService.isTokenValid(jwt, userDetails)) {
+      Account account = accountService.loadUserByEmail(email);
+      if (jwtService.isTokenValid(jwt, account)) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-            userDetails,
+            account,
             null,
-            userDetails.getAuthorities()
+            account.getAuthorities()
         );
         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         context.setAuthentication(authToken);

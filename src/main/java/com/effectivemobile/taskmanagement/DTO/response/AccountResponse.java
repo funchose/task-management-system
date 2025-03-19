@@ -4,6 +4,7 @@ import com.effectivemobile.taskmanagement.utils.Role;
 
 public class AccountResponse {
   private Long id;
+  private String email;
 
   private String username;
 
@@ -11,8 +12,9 @@ public class AccountResponse {
 
   private Role role;
 
-  public AccountResponse(Long id, String username, String password, Role role) {
+  public AccountResponse(Long id, String email, String username, String password, Role role) {
     this.id = id;
+    this.email = email;
     this.username = username;
     this.password = password;
     this.role = role;
@@ -24,6 +26,15 @@ public class AccountResponse {
 
   public AccountResponse setId(Long id) {
     this.id = id;
+    return this;
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
+  public AccountResponse setEmail(String email) {
+    this.email = email;
     return this;
   }
 

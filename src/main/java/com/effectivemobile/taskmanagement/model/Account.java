@@ -2,6 +2,7 @@ package com.effectivemobile.taskmanagement.model;
 
 import com.effectivemobile.taskmanagement.utils.Role;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import java.util.Collection;
 import java.util.List;
@@ -16,6 +17,12 @@ public class Account implements UserDetails {
   @Column(name = "id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  @NotBlank(message = "Email is required")
+  @Column(unique = true)
+  @Email
+  private String email;
+
   @NotBlank(message = "Username is required")
   @Column(unique = true)
   private String username;
@@ -25,15 +32,24 @@ public class Account implements UserDetails {
   @Enumerated(EnumType.STRING)
   @Column
   private Role role;
-
-  public Account(Long id, String username, String password, Role role) {
+  public Account(Long id, String email, String username, String password, Role role) {
     this.id = id;
+    this.email = email;
     this.username = username;
     this.password = password;
     this.role = role;
   }
 
   public Account() {
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
+  public Account setEmail(String email) {
+    this.email = email;
+    return this;
   }
 
   public Account setId(Long id) {

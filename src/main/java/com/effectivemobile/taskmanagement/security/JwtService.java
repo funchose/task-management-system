@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,21 +21,19 @@ public class JwtService {
   @Value("${JWT_SECRET}")
   private String jwtSigningKey;
 
-  public String extractUserName(String token) {
+  public String extractEmail(String token) {
     return extractClaim(token, Claims::getSubject);
   }
 
-  public String generateToken(UserDetails userDetails) {
+  public String generateToken(Account account) {
     Map<String, Object> claims = new HashMap<>();
-    if (userDetails instanceof Account account) {
-      claims.put("username", account.getUsername());
-    }
-    return generateToken(claims, userDetails);
+    claims.put("email", account.getEmail());
+    return generateToken(claims, account);
   }
 
-  public boolean isTokenValid(String token, UserDetails userDetails) {
-    final String userName = extractUserName(token);
-    return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token);
+  public boolean isTokenValid(String token, Account account) {
+    final String email = extractEmail(token);
+    return (email.equals(account.getEmail())) && !isTokenExpired(token);
   }
 
   private <T> T extractClaim(String token, Function<Claims, T> claimsResolvers) {
@@ -44,9 +41,9 @@ public class JwtService {
     return claimsResolvers.apply(claims);
   }
 
-  public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+  public String generateToken(Map<String, Object> extraClaims, Account account) {
     int jwtExpirationMs = 3000000 + 60 * 24;
-    return Jwts.builder().claims(extraClaims).subject(userDetails.getUsername())
+    return Jwts.builder().claims(extraClaims).subject(account.getEmail())
         .issuedAt(new Date(System.currentTimeMillis()))
         .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
         .signWith(getSigningKey(), SignatureAlgorithm.HS256).compact();

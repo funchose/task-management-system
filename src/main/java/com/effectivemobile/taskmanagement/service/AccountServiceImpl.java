@@ -20,20 +20,25 @@ public class AccountServiceImpl implements UserDetailsService, AccountService {
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    return getByUsername(username);
+    return getByEmail(username);
   }
 
-  public UserDetails getByUsername(String username) {
-    return accountRepository.findByUsername(username)
+  public UserDetails getByEmail(String username) {
+    return accountRepository.findByEmail(username)
         .orElseThrow(() -> new AccountNotFoundException(username));
   }
 
   public UserDetailsService userDetailsService() {
-    return this::getByUsername;
+    return this::getByEmail;
   }
 
   @Override
   public Long addProfile(Account account) {
     return accountRepository.save(account).getId();
+  }
+
+  public Account loadUserByEmail(String email) {
+    return accountRepository.findByEmail(email)
+        .orElseThrow(() -> new AccountNotFoundException(email));
   }
 }
