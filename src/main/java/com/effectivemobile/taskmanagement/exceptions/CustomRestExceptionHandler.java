@@ -3,6 +3,8 @@ package com.effectivemobile.taskmanagement.exceptions;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
@@ -13,7 +15,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
-
+@Hidden
 @ControllerAdvice
 public class CustomRestExceptionHandler {
 
@@ -112,7 +114,7 @@ public class CustomRestExceptionHandler {
    * @return response with HTTP code and exception message
    */
   @ExceptionHandler({DataIntegrityViolationException.class})
-  public ResponseEntity<Object> handlerDataIntegrityViolationException(
+  public ResponseEntity<Object> Exception(
       DataIntegrityViolationException ex) {
     ErrorResponse errorResponse =
         new ErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());

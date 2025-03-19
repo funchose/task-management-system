@@ -1,0 +1,31 @@
+services:
+  app:
+    image: 'task-management-system:latest'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    container_name: app
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - JWT_SECRET=k0idofgjoeijwofmwpr3o3k2o3ijt20tij4nefnowekropwork2o3irj23rop2krnfroirjf3otjt4nmoifj3oirk2rjoit23
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - ASPNETCORE_ENVIRONMENT=Development
+
+  db:
+    image: 'postgres:13.1-alpine'
+    container_name: db
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - $DB_DIR:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
