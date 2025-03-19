@@ -8,12 +8,15 @@ public class EditTaskRequest {
   private String description;
   private TaskPriority priority;
   private Status status;
+  private Long performerId;
 
-  public EditTaskRequest(String name, String description, TaskPriority priority, Status status) {
+  public EditTaskRequest(String name, String description, TaskPriority priority,
+                         Status status, Long performerId) {
     this.name = name;
     this.description = description;
     this.priority = priority;
     this.status = status;
+    this.performerId = performerId;
   }
 
   public String getName() {
@@ -49,6 +52,15 @@ public class EditTaskRequest {
 
   public EditTaskRequest setStatus(Status status) {
     this.status = status;
+    return this;
+  }
+
+  public Long getPerformerId() {
+    return performerId;
+  }
+
+  public EditTaskRequest setPerformerId(Long performerId) {
+    this.performerId = performerId;
     return this;
   }
 }

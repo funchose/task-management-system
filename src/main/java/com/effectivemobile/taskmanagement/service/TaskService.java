@@ -4,6 +4,7 @@ import com.effectivemobile.taskmanagement.DTO.request.AddTaskRequest;
 import com.effectivemobile.taskmanagement.DTO.request.EditTaskRequest;
 import com.effectivemobile.taskmanagement.DTO.response.CreateTaskResponse;
 import com.effectivemobile.taskmanagement.DTO.response.DeleteTaskResponse;
+import com.effectivemobile.taskmanagement.DTO.response.EditTaskResponse;
 import com.effectivemobile.taskmanagement.DTO.response.TaskResponse;
 import com.effectivemobile.taskmanagement.model.Account;
 import java.util.List;
@@ -19,7 +20,7 @@ public interface TaskService {
 
   CreateTaskResponse createTask(AddTaskRequest request, Long id);
 
-  TaskResponse editTask(Account account, Long taskId, EditTaskRequest request);
+  EditTaskResponse editTask(Account account, Long taskId, EditTaskRequest request);
 
   DeleteTaskResponse deleteTask(Long taskId);
 }

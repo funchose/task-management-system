@@ -4,6 +4,7 @@ import com.effectivemobile.taskmanagement.DTO.request.AddTaskRequest;
 import com.effectivemobile.taskmanagement.DTO.request.EditTaskRequest;
 import com.effectivemobile.taskmanagement.DTO.response.CreateTaskResponse;
 import com.effectivemobile.taskmanagement.DTO.response.DeleteTaskResponse;
+import com.effectivemobile.taskmanagement.DTO.response.EditTaskResponse;
 import com.effectivemobile.taskmanagement.DTO.response.TaskResponse;
 import com.effectivemobile.taskmanagement.model.Account;
 import com.effectivemobile.taskmanagement.service.TaskService;
@@ -36,8 +37,9 @@ public class TaskController {
   }
 
   @GetMapping("/tasks/performer/{performerId}")
-  public ResponseEntity<List<TaskResponse>> getPerformerTasks(@AuthenticationPrincipal Account account,
-                                                              @PathVariable Long performerId) {
+  public ResponseEntity<List<TaskResponse>> getPerformerTasks(
+      @AuthenticationPrincipal Account account,
+      @PathVariable Long performerId) {
     var taskDTOs = taskService.getPerformerTasks(account, performerId);
     return new ResponseEntity<>(taskDTOs, HttpStatus.OK);
   }
@@ -51,9 +53,9 @@ public class TaskController {
   }
 
   @PutMapping("/tasks/{taskId}")
-  public ResponseEntity<TaskResponse> editTask(@RequestBody EditTaskRequest request,
-                                               @AuthenticationPrincipal Account account,
-                                               @PathVariable Long taskId) {
+  public ResponseEntity<EditTaskResponse> editTask(@RequestBody EditTaskRequest request,
+                                                   @AuthenticationPrincipal Account account,
+                                                   @PathVariable Long taskId) {
     var editedTask = taskService.editTask(account, taskId, request);
     return new ResponseEntity<>(editedTask, HttpStatus.OK);
   }

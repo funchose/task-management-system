@@ -1,13 +1,33 @@
 package com.effectivemobile.taskmanagement.DTO.response;
 
-import com.effectivemobile.taskmanagement.model.Account;
-import com.effectivemobile.taskmanagement.model.Task;
+import com.effectivemobile.taskmanagement.model.Comment;
 
 public class CommentResponse {
-  private Long id;
-  private Task task;
+  private final Long id;
+  private final Long taskId;
+  private final Long commentAuthorId;
+  private final String text;
 
-  private Account commentAuthor;
+  public CommentResponse(Comment comment) {
+    this.id = comment.getId();
+    this.taskId = comment.getTaskId();
+    this.commentAuthorId = comment.getCommentAuthorId();
+    this.text = comment.getText();
+  }
 
-  private String text;
+  public Long getId() {
+    return id;
+  }
+
+  public Long getTaskId() {
+    return taskId;
+  }
+
+  public Long getCommentAuthorId() {
+    return commentAuthorId;
+  }
+
+  public String getText() {
+    return text;
+  }
 }

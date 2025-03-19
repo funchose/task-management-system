@@ -4,6 +4,7 @@ import com.effectivemobile.taskmanagement.DTO.request.AddTaskRequest;
 import com.effectivemobile.taskmanagement.DTO.request.EditTaskRequest;
 import com.effectivemobile.taskmanagement.DTO.response.CreateTaskResponse;
 import com.effectivemobile.taskmanagement.DTO.response.DeleteTaskResponse;
+import com.effectivemobile.taskmanagement.DTO.response.EditTaskResponse;
 import com.effectivemobile.taskmanagement.DTO.response.TaskResponse;
 import com.effectivemobile.taskmanagement.exceptions.AccountNotFoundException;
 import com.effectivemobile.taskmanagement.exceptions.TaskNotFoundException;
@@ -66,6 +67,7 @@ public class TaskServiceImpl implements TaskService {
         .setPerformerAccount(authorAndPerformer)
         .setDescription(request.getDescription())
         .setPriority(request.getPriority())
+        .setActive(true)
         .setStatus(Status.TODO);
     var savedTask = taskRepository.save(taskToCreate);
     return new CreateTaskResponse(savedTask.getId(), savedTask.getName());
@@ -73,12 +75,14 @@ public class TaskServiceImpl implements TaskService {
 
   @Override
   @Transactional
-  public TaskResponse editTask(Account account, Long taskId, EditTaskRequest request) {
+  public EditTaskResponse editTask(Account account, Long taskId, EditTaskRequest request) {
     var task = taskRepository.findById(taskId).orElseThrow(() -> new TaskNotFoundException(taskId));
-    if (account.getRole().equals(Role.ROLE_USER)
-        && task.getPerformerAccount().getId().equals(account.getId())) {
+    boolean isPerformer = account.getRole().equals(Role.ROLE_USER)
+        && task.getPerformerAccount().getId().equals(account.getId());
+    boolean isAdmin = account.getRole().equals(Role.ROLE_ADMIN);
+    if (isPerformer) {
       return editTaskByUser(task, request);
-    } else if (account.getRole().equals(Role.ROLE_ADMIN)) {
+    } else if (isAdmin) {
       return editTaskByAdmin(task, request);
     } else {
       throw new RuntimeException("Unauthorized task editing");
@@ -94,16 +98,16 @@ public class TaskServiceImpl implements TaskService {
     return new DeleteTaskResponse(taskId);
   }
 
-  private TaskResponse editTaskByUser(Task task, EditTaskRequest request) {
+  private EditTaskResponse editTaskByUser(Task task, EditTaskRequest request) {
     if (request.getStatus() != null) {
       task.setStatus(request.getStatus());
-      return new TaskResponse(task);
+      return new EditTaskResponse(task.getId(), task.getName());
     } else {
       throw new RuntimeException("User can edit status task only or add comment");
     }
   }
 
-  private TaskResponse editTaskByAdmin(Task task, EditTaskRequest request) {
+  private EditTaskResponse editTaskByAdmin(Task task, EditTaskRequest request) {
     if (request.getStatus() != null) {
       task.setStatus(request.getStatus());
     }
@@ -116,8 +120,10 @@ public class TaskServiceImpl implements TaskService {
     if (request.getPriority() != null) {
       task.setPriority(request.getPriority());
     }
-    return new TaskResponse(task);
+    if (request.getPerformerId() != null) {
+      task.setPerformerAccount(accountRepository.findById(request.getPerformerId())
+          .orElseThrow(() -> new AccountNotFoundException(request.getPerformerId())));
+    }
+    return new EditTaskResponse(task.getId(), task.getName());
   }
-
-
 }

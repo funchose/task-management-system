@@ -4,6 +4,7 @@ import com.effectivemobile.taskmanagement.utils.Status;
 import com.effectivemobile.taskmanagement.utils.TaskPriority;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import org.hibernate.annotations.SQLRestriction;
@@ -40,6 +41,7 @@ public class Task {
   private List<Comment> comments = new ArrayList<>();
   @Enumerated(EnumType.STRING)
   @Column(length = 10)
+  @NotNull
   private TaskPriority priority;
   @Enumerated(EnumType.STRING)
   @Column(length = 15)
