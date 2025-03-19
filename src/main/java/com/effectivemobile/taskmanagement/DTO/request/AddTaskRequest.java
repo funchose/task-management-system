@@ -10,7 +10,7 @@ public class AddTaskRequest {
   private String name;
   @NotBlank(message = "Task description is required")
   private String description;
-  @NotNull
+  @NotNull(message = "Task status is required")
   private TaskPriority priority;
 
   public AddTaskRequest(Long performerId, String name, String description, TaskPriority priority) {

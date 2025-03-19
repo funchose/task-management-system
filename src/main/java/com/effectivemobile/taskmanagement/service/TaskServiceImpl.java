@@ -2,10 +2,11 @@ package com.effectivemobile.taskmanagement.service;
 
 import com.effectivemobile.taskmanagement.DTO.request.AddTaskRequest;
 import com.effectivemobile.taskmanagement.DTO.request.EditTaskRequest;
-import com.effectivemobile.taskmanagement.DTO.response.CreateTaskResponse;
+import com.effectivemobile.taskmanagement.DTO.response.AddTaskResponse;
 import com.effectivemobile.taskmanagement.DTO.response.DeleteTaskResponse;
 import com.effectivemobile.taskmanagement.DTO.response.EditTaskResponse;
 import com.effectivemobile.taskmanagement.DTO.response.TaskResponse;
+import com.effectivemobile.taskmanagement.exceptions.AccessDeniedException;
 import com.effectivemobile.taskmanagement.exceptions.AccountNotFoundException;
 import com.effectivemobile.taskmanagement.exceptions.TaskNotFoundException;
 import com.effectivemobile.taskmanagement.model.Account;
@@ -58,19 +59,26 @@ public class TaskServiceImpl implements TaskService {
 
   @Override
   @Transactional
-  public CreateTaskResponse createTask(AddTaskRequest request, Long authorId) {
+  public AddTaskResponse createTask(AddTaskRequest request, Long authorId) {
     var authorAndPerformer = accountRepository.findById(authorId).get();
     var taskToCreate = new Task()
         .setId(null)
         .setName(request.getName())
         .setAuthorAccount(authorAndPerformer)
-        .setPerformerAccount(authorAndPerformer)
         .setDescription(request.getDescription())
         .setPriority(request.getPriority())
         .setActive(true)
         .setStatus(Status.TODO);
-    var savedTask = taskRepository.save(taskToCreate);
-    return new CreateTaskResponse(savedTask.getId(), savedTask.getName());
+    if (request.getPerformerId() != null) {
+      var performerId = request.getPerformerId();
+      var performer = accountRepository.findById(performerId)
+          .orElseThrow(() -> new AccountNotFoundException(performerId));
+        taskToCreate.setPerformerAccount(performer);
+    } else {
+        taskToCreate.setPerformerAccount(authorAndPerformer);
+    }
+      var savedTask = taskRepository.save(taskToCreate);
+    return new AddTaskResponse(savedTask.getId(), savedTask.getName());
   }
 
   @Override
@@ -85,7 +93,7 @@ public class TaskServiceImpl implements TaskService {
     } else if (isAdmin) {
       return editTaskByAdmin(task, request);
     } else {
-      throw new RuntimeException("Unauthorized task editing");
+      throw new AccessDeniedException("Unauthorized task editing");
     }
   }
 

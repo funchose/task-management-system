@@ -6,6 +6,7 @@ import com.effectivemobile.taskmanagement.DTO.response.AddCommentResponse;
 import com.effectivemobile.taskmanagement.DTO.response.CommentResponse;
 import com.effectivemobile.taskmanagement.DTO.response.DeleteCommentResponse;
 import com.effectivemobile.taskmanagement.DTO.response.EditCommentResponse;
+import com.effectivemobile.taskmanagement.exceptions.AccessDeniedException;
 import com.effectivemobile.taskmanagement.exceptions.CommentNotFoundException;
 import com.effectivemobile.taskmanagement.exceptions.TaskNotFoundException;
 import com.effectivemobile.taskmanagement.model.Account;
@@ -36,7 +37,7 @@ public class CommentServiceImpl implements CommentService {
       return commentRepository.findByTaskId(taskId).get().stream()
           .map(CommentResponse::new).toList();
     } else {
-      throw new RuntimeException("Unauthorized comment receiving");
+      throw new AccessDeniedException("Unauthorized comment receiving");
     }
   }
 
@@ -58,7 +59,7 @@ public class CommentServiceImpl implements CommentService {
       Comment newComment = commentRepository.save(comment);
       return new AddCommentResponse(newComment.getId());
     } else {
-      throw new RuntimeException("Unauthorized comment creation");
+      throw new AccessDeniedException("Unauthorized comment creation");
     }
   }
 
@@ -74,7 +75,7 @@ public class CommentServiceImpl implements CommentService {
       commentRepository.save(comment);
       return new EditCommentResponse(commentId);
     } else {
-      throw new RuntimeException("Unauthorized comment editing");
+      throw new AccessDeniedException("Unauthorized comment editing");
     }
   }
 

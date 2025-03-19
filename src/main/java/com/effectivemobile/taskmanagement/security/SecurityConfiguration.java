@@ -1,11 +1,13 @@
 package com.effectivemobile.taskmanagement.security;
 
 import com.effectivemobile.taskmanagement.service.AccountServiceImpl;
+import com.effectivemobile.taskmanagement.utils.Role;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,10 +18,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @Configuration
 @EnableWebSecurity
+@EnableWebMvc
 public class SecurityConfiguration {
   private final AccountServiceImpl accountService;
 
@@ -41,14 +46,25 @@ public class SecurityConfiguration {
           return corsConfiguration;
         }))
         .authorizeHttpRequests(request -> request
-                .requestMatchers("/**").permitAll())
-//            .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
-//            .requestMatchers(HttpMethod.GET, "/profiles/**").authenticated()
-//            .requestMatchers(HttpMethod.PUT, "/profiles/**").authenticated()
-//            .requestMatchers(HttpMethod.DELETE, "/profiles/**").authenticated())
-        .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
-        .authenticationProvider(authenticationProvider())
-        .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
+            .requestMatchers("/swagger-ui/**", "/swagger-ui.html",
+                "/swagger-resources/*", "/v3/api-docs/**").permitAll()
+            .requestMatchers("/auth/sign-in", "/auth/sign-up").permitAll()
+            .requestMatchers("/auth/refresh").authenticated()
+            .requestMatchers(HttpMethod.GET, "/tasks").authenticated()
+            .requestMatchers(HttpMethod.PUT, "/tasks/*").authenticated()
+            .requestMatchers(antMatcher("/tasks/performer/**"), antMatcher("/tasks/author/**"))
+            .hasAuthority(Role.ROLE_ADMIN.getRole())
+            .requestMatchers(HttpMethod.POST, "/tasks")
+            .hasAuthority(Role.ROLE_ADMIN.getRole())
+            .requestMatchers(HttpMethod.DELETE, "/tasks/**")
+            .hasAuthority(Role.ROLE_ADMIN.getRole())
+            .requestMatchers(HttpMethod.GET, "/tasks/*/comments").authenticated()
+            .requestMatchers(HttpMethod.POST, "/tasks/*/comments").authenticated()
+            .requestMatchers(HttpMethod.PUT, "/tasks/comments/**").authenticated()
+            .requestMatchers(HttpMethod.DELETE, "/tasks/comments/**")
+            .hasAuthority(Role.ROLE_ADMIN.getRole()))
+            .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
+            .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
     return http.build();
   }
 
@@ -58,16 +74,11 @@ public class SecurityConfiguration {
   }
 
   @Bean
-  public AuthenticationProvider authenticationProvider() {
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig)
+      throws Exception {
     var authProvider = new DaoAuthenticationProvider();
     authProvider.setUserDetailsService(accountService.userDetailsService());
     authProvider.setPasswordEncoder(passwordEncoder());
-    return authProvider;
-  }
-
-  @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig)
-      throws Exception {
-    return authConfig.getAuthenticationManager();
+    return new ProviderManager(authProvider);
   }
 }

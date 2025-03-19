@@ -2,7 +2,7 @@ package com.effectivemobile.taskmanagement.service;
 
 import com.effectivemobile.taskmanagement.DTO.request.AddTaskRequest;
 import com.effectivemobile.taskmanagement.DTO.request.EditTaskRequest;
-import com.effectivemobile.taskmanagement.DTO.response.CreateTaskResponse;
+import com.effectivemobile.taskmanagement.DTO.response.AddTaskResponse;
 import com.effectivemobile.taskmanagement.DTO.response.DeleteTaskResponse;
 import com.effectivemobile.taskmanagement.DTO.response.EditTaskResponse;
 import com.effectivemobile.taskmanagement.DTO.response.TaskResponse;
@@ -18,7 +18,7 @@ public interface TaskService {
 
   List<TaskResponse> getPerformerTasks(Account account, Long performerId);
 
-  CreateTaskResponse createTask(AddTaskRequest request, Long id);
+  AddTaskResponse createTask(AddTaskRequest request, Long id);
 
   EditTaskResponse editTask(Account account, Long taskId, EditTaskRequest request);
 

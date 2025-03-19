@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 @Entity
 @Table(name = "account")
 public class Account implements UserDetails {
@@ -16,7 +17,7 @@ public class Account implements UserDetails {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
   @NotBlank(message = "Username is required")
-  @Column
+  @Column(unique = true)
   private String username;
   @NotBlank(message = "Password is required")
   @Column

@@ -1,7 +1,10 @@
 package com.effectivemobile.taskmanagement.controller;
 
+import com.effectivemobile.taskmanagement.DTO.request.RefreshTokenRequest;
 import com.effectivemobile.taskmanagement.DTO.request.SignInRequest;
 import com.effectivemobile.taskmanagement.DTO.request.SignUpRequest;
+import com.effectivemobile.taskmanagement.DTO.response.RefreshTokenResponse;
+import com.effectivemobile.taskmanagement.DTO.response.SignInResponse;
 import com.effectivemobile.taskmanagement.service.AuthServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +24,12 @@ public class AuthController {
   }
 
   @PostMapping("/auth/sign-in")
-  public String signIn(@RequestBody @Valid SignInRequest request) {
+  public SignInResponse signIn(@RequestBody @Valid SignInRequest request) {
     return authService.signIn(request);
+  }
+
+  @PostMapping("/auth/refresh")
+  public RefreshTokenResponse refreshToken(@RequestBody @Valid RefreshTokenRequest request) {
+    return authService.refreshToken(request);
   }
 }

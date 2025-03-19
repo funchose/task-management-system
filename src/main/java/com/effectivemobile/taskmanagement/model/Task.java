@@ -56,6 +56,7 @@ public class Task {
   public Task setActive(boolean active) {
     isActive = active;
     return this;
+
   }
 
   public Task(Account authorAccount, Account performerAccount,

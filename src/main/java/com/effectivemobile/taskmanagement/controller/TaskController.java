@@ -2,12 +2,13 @@ package com.effectivemobile.taskmanagement.controller;
 
 import com.effectivemobile.taskmanagement.DTO.request.AddTaskRequest;
 import com.effectivemobile.taskmanagement.DTO.request.EditTaskRequest;
-import com.effectivemobile.taskmanagement.DTO.response.CreateTaskResponse;
+import com.effectivemobile.taskmanagement.DTO.response.AddTaskResponse;
 import com.effectivemobile.taskmanagement.DTO.response.DeleteTaskResponse;
 import com.effectivemobile.taskmanagement.DTO.response.EditTaskResponse;
 import com.effectivemobile.taskmanagement.DTO.response.TaskResponse;
 import com.effectivemobile.taskmanagement.model.Account;
 import com.effectivemobile.taskmanagement.service.TaskService;
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,8 +47,8 @@ public class TaskController {
 
 
   @PostMapping("/tasks")
-  public ResponseEntity<CreateTaskResponse> createTask(@RequestBody AddTaskRequest request,
-                                                       @AuthenticationPrincipal Account account) {
+  public ResponseEntity<AddTaskResponse> createTask(@RequestBody @Valid AddTaskRequest request,
+                                                    @AuthenticationPrincipal Account account) {
     var createTaskDTO = taskService.createTask(request, account.getId());
     return new ResponseEntity<>(createTaskDTO, HttpStatus.CREATED);
   }
